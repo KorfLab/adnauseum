@@ -17,7 +17,6 @@ for rc in read_count:
 	reads = random.choices(sampler, k=rc)
 	print(reads)
 	
-			
 		
 
 
