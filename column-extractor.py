@@ -1,25 +1,49 @@
 import argparse
-import pandas as pd
+import gzip
+import os
+import sys
+import openpyxl
+
+def pref_gene_name(gene):
+	# try simple lookup first
+	if gene in NAME_TABLE: return NAME_TABLE[gene]
+
+	# try removing Gene prefix
+	if ':' in gene:
+		prefix, txt = gene.split(':')
+		if txt in NAME_TABLE: return NAME_TABLE[txt]
+
+	# failure mode: flag with stars
+	return f'*{gene}*'
 
 def readexcel(file, headers, genecol, l4col):
-	l4cols = l4col.split(';')
-	print(l4cols)
-	#df = pd.read_excel(file)
+	pass
 
-def readfile(file, ftype, fend, headers, genecol, l4col):
-	l4cols = l4col.split(';')
-	print(l4cols)
-	print(l4col)
+def readfile(file, ftype, headers, genecol, l4col):
+	if not file.endswith('.gz'): sys.exit(f'expecting gzip >>{file}<<')
 
-def tx2gene(uid):
-	f = uid.split('.')
-	if   len(f) < 2: return ''
-	elif len(f) == 2: clone, gene = f
-	elif len(f) == 3: clone, gene, iso = f
-	else: sys.exit(f'wtf {f}')
+	l4columns = l4col.split(';')          # human version
+	col0 = [int(x) -1 for x in l4columns] # computer version
+	gen0 = int(genecol) -1                # computer version
+	sep = '\t' if ftype == 'TSV' else ','
+	genes = []
+	values = [ [] for _ in range(len(col0))]
+	with gzip.open(file, 'rt') as fp:
+		for _ in range(headers): line = next(fp)
+		for line in fp:
+			col = line.split(sep)
+			genes.append(pref_gene_name(col[gen0]))
+			for i, val in enumerate(col0):
+				try:
+					f = float(col[val])
+					values[i].append(float(col[val]))
+				except:
+					print(line)
+					sys.exit(f'wtf >>{col[val]}<<')
 
-	if   gene[-1].isdigit(): return f'{clone}.{gene}'
-	elif gene[-1].isalpha(): return f'{clone}.{gene[:-1]}'
+	for exp in values: yield {k: v for k, v in zip(genes, exp)}
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--faves', metavar='<file>', default='favorites.tsv',
@@ -32,84 +56,28 @@ parser.add_argument('outdir', help='output directory')
 arg = parser.parse_args()
 
 # preload gene names for lookup
-name_table = {}
+NAME_TABLE = {}
 with open(arg.genes) as fp:
 	for line in fp:
 		names = line.split()
 		pref = names[0]
-		for alias in names: name_table[alias] = pref
+		for alias in names: NAME_TABLE[alias] = pref
 
-
-
+# process favorites
+os.system(f'mkdir -p {arg.outdir}')
 with open(arg.faves) as fp:
 	header = next(fp)
 	for line in fp:
-		f = line.split('\t')
-		if len(f) == 9: f.pop()
-		gse, ok, ftype, fend, hl, gene, l4, file = f
-		if ftype == 'Excel': data = readexcel(file, hl, gene, l4)
-		else:                data = readfile(file, ftype, fend, hl, gene, l4)
-		# do something to check data
-
-"""
-
-
-if arg.build:
-	for filename in glob.glob(f'{arg.build}/*'):
-		with open(filename) as fp: gene = json.load(fp)
-		ids = set()
-		for db in gene:
-			if 'display_id' in db: ids.add(db['display_id'])
-			if 'primary_id' in db: ids.add(db['primary_id'])
-		wbid = None
-		for uid in ids:
-			if uid.startswith('WBGene'):
-				wbid = uid
-				break
-		if wbid not in names: names[wbid] = []
-		for uid in ids:
-			if uid != wbid: names[wbid].append(uid)
-	with open(arg.index, 'w') as fp:
-		print(json.dumps(names, indent=2), file=fp)
-else:
-	with open(arg.index) as fp: names = json.load(fp)
-
-lookup = {}
-for wbid in names:
-	for xid in names[wbid]:
-		if xid not in lookup: lookup[xid] = []
-		lookup[xid].append(wbid)
-	lookup[wbid] = [wbid] # just in case
-
-if arg.file == '-': fp = sys.stdin
-else: fp = open(arg.file)
-
-missing = set()
-multiple = set()
-for line in fp:
-	line = line.rstrip()
-	f = line.split(maxsplit=1)
-	if len(f) == 1:
-		uid = line
-		stuff = None
-	else: uid, stuff = f
-
-	if uid not in lookup:
-		uid = tx2gene(uid) # try transcript ID instead
-		if uid not in lookup:
-			missing.add(uid)
+		f = line.rstrip().split('\t')
+		if len(f) == 8: f.pop()
+		gse, ok, ftype, hl, gene, l4, file = f
+		hl = int(hl)
+		if ftype == 'Excel':
+			#dataset = readexcel(f'{arg.data}/{file}', hl, gene, l4)
 			continue
-
-	if len(lookup[uid]) > 1:
-		multiple.add(uid)
-		continue
-	if stuff is None:
-		print(lookup[uid])
-	else:
-		print(lookup[uid][0], stuff, sep='\t')
-
-
-print('missing:', missing, file=sys.stderr)
-print('multiple:', multiple, file=sys.stderr)
-
-"""
+		else:
+			dataset = readfile(f'{arg.data}/{file}', ftype, hl, gene, l4)
+		for i, data in enumerate(dataset):
+			with open(f'{arg.outdir}/{gse}.{i}', 'w') as ofp:
+				for gene, val in data.items():
+					print(gene, val, sep='\t', file=ofp)

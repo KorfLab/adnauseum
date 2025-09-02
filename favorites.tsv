@@ -1,18 +1,18 @@
-Accession	OK	File Type	Ending	HL	Gene	L4	Filename	Notes
-GSE100623	x	TSV	LF	1	1	2;3	GSE100623_n2set9set26set9set26rnaseq.txt.gz	ribominus
-GSE100829	x	TSV	LF	1	1	2;3	GSE100623_n2set9set26set9set26rnaseq.txt.gz	poly-A
-GSE104500	x	CSV	CR	1	1	2;3;4	GSE104500_Abundance.csv.gz
-GSE105036	x	TSV	LF	1	1	5;6;7	GSE105036_count.table.txt.gz
-GSE107799	x	TSV	LF	1	1	2;3	GSE107799_Rawcounts.txt.gz
-GSE108848	x	Excel		1	A	B;C	GSE108848_n2f1set9set26rnaseq.xlsx	ribominus
-GSE111364	x	TSV	LF	1	1	2;3;4	GSE111364_Mtrans_counts_table.txt.gz
-GSE113136	x	TSV	LF	1	1	9;23	GSE113136_counts.txt.gz	RNAi control ok
-GSE114951	x	TSV	LF	1	1	10;11;12;13;14;15	GSE114951_featureCounts.txt.gz
-GSE115095	x	TSV	LF	2	1	1;2;3;4;5;6	GSE115095_All_gene_fpkm.list.txt.gz	15 vs 25 deg, double header
-GSE116367	x	TSV	LF	1	1	3;4;8;10;12;13	GSE116367_nrde4.counts.txt.gz	early and late L4
-GSE118400	x	TSV	LF	1	1	2;5;12	GSE118400_nematocida.counts.matrix.txt.gz
-GSE119292	x	TSV	LF	1	1	5;7;9	GSE119292_genes_counts.txt.gz
-GSE121920	x	TSV	LF	1	1	2;3;4	GSE121920_fpkm.txt.gz
-GSE123507	x	TSV	CR	1	1	7;8	GSE123507_all.gene.FPKM.txt.gz
-GSE128968	x	TSV	LF	1	1	9;10;11	GSE128968_degust.tsv.gz
-GSE129642	x	Excel		2	A	K;L	GSE129642_cer6_cer39_and_WT_transcripts_count.xlsx.gz
+Accession	OK	File Type	HL	Gene	L4	Filename	Notes
+GSE100623	x	TSV	2	1	2;3	GSE100623_n2set9set26set9set26rnaseq.txt.gz	ribominus
+GSE100829	x	TSV	1	1	2;3	GSE100829_N2_HPL-2_rawCounts.txt.gz	poly-A
+GSE104500	x	CSV	1	1	2;3;4	GSE104500_Abundance.csv.gz
+GSE105036	x	TSV	1	1	5;6;7	GSE105036_count.table.txt.gz
+GSE107799	x	TSV	1	1	2;3	GSE107799_Rawcounts.txt.gz
+GSE108848	x	Excel	1	A	B;C	GSE108848_n2f1set9set26rnaseq.xlsx	ribominus
+GSE111364	x	TSV	1	1	2;3;4	GSE111364_Mtrans_counts_table.txt.gz
+GSE113136	x	TSV	2	1	9;23	GSE113136_counts.txt.gz	RNAi control ok
+GSE114951	x	TSV	1	1	10;11;12;13;14;15	GSE114951_featureCounts.txt.gz
+GSE115095	x	TSV	2	2	3;4;5;6;7;8	GSE115095_All_gene_fpkm.list.txt.gz	15 vs 25 deg, double header
+GSE116367	x	TSV	2	1	8;9;13;15;17;18	GSE116367_nrde4.counts.txt.gz	early and late L4
+GSE118400	x	CSV	1	1	2;5;12	GSE118400_nematocida.counts.matrix.txt.gz
+GSE119292	x	TSV	1	1	5;7;9	GSE119292_genes_counts.txt.gz
+GSE121920	x	TSV	1	1	2;3;4	GSE121920_fpkm.txt.gz
+GSE123507	x	TSV	1	1	7;8	GSE123507_all.gene.FPKM.txt.gz
+GSE128968	x	TSV	1	1	9;10;11	GSE128968_degust.tsv.gz
+GSE129642	x	Excel	2	A	K;L	GSE129642_cer6_cer39_and_WT_transcripts_count.xlsx.gz
