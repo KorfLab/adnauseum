@@ -2,24 +2,13 @@ import argparse
 import gzip
 import os
 import sys
-import openpyxl
 
-def pref_gene_name(gene):
-	# try simple lookup first
-	if gene in NAME_TABLE: return NAME_TABLE[gene]
-
-	# try removing Gene prefix
-	if ':' in gene:
-		prefix, txt = gene.split(':')
-		if txt in NAME_TABLE: return NAME_TABLE[txt]
-
-	# failure mode: flag with stars
-	return f'*{gene}*'
+import wormnames
 
 def readexcel(file, headers, genecol, l4col):
 	pass
 
-def readfile(file, ftype, headers, genecol, l4col):
+def readfile(file, ftype, headers, genecol, l4col, nn):
 	if not file.endswith('.gz'): sys.exit(f'expecting gzip >>{file}<<')
 
 	l4columns = l4col.split(';')          # human version
@@ -32,7 +21,7 @@ def readfile(file, ftype, headers, genecol, l4col):
 		for _ in range(headers): line = next(fp)
 		for line in fp:
 			col = line.split(sep)
-			genes.append(pref_gene_name(col[gen0]))
+			genes.append(nn.pref_gene_name(col[gen0]))
 			for i, val in enumerate(col0):
 				try:
 					f = float(col[val])
@@ -42,7 +31,6 @@ def readfile(file, ftype, headers, genecol, l4col):
 					sys.exit(f'wtf >>{col[val]}<<')
 
 	for exp in values: yield {k: v for k, v in zip(genes, exp)}
-
 
 
 parser = argparse.ArgumentParser()
@@ -55,15 +43,8 @@ parser.add_argument('--data', metavar='<dir>', default='raw',
 parser.add_argument('outdir', help='output directory')
 arg = parser.parse_args()
 
-# preload gene names for lookup
-NAME_TABLE = {}
-with open(arg.genes) as fp:
-	for line in fp:
-		names = line.split()
-		pref = names[0]
-		for alias in names: NAME_TABLE[alias] = pref
+nn = wormnames.NameNormalizer(arg.genes)
 
-# process favorites
 os.system(f'mkdir -p {arg.outdir}')
 with open(arg.faves) as fp:
 	header = next(fp)
@@ -76,7 +57,7 @@ with open(arg.faves) as fp:
 			#dataset = readexcel(f'{arg.data}/{file}', hl, gene, l4)
 			continue
 		else:
-			dataset = readfile(f'{arg.data}/{file}', ftype, hl, gene, l4)
+			dataset = readfile(f'{arg.data}/{file}', ftype, hl, gene, l4, nn)
 		for i, data in enumerate(dataset):
 			with open(f'{arg.outdir}/{gse}.{i}', 'w') as ofp:
 				for gene, val in data.items():
