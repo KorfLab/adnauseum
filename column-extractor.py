@@ -3,7 +3,7 @@ import gzip
 import os
 import sys
 
-import wormnames
+import adnauseum
 
 def readexcel(file, headers, genecol, l4col):
 	pass
@@ -43,7 +43,7 @@ parser.add_argument('--data', metavar='<dir>', default='raw',
 parser.add_argument('outdir', help='output directory')
 arg = parser.parse_args()
 
-nn = wormnames.NameNormalizer(arg.genes)
+nn = adnauseum.NameNormalizer(arg.genes)
 
 os.system(f'mkdir -p {arg.outdir}')
 with open(arg.faves) as fp:

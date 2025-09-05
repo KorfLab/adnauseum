@@ -1,3 +1,14 @@
+import gzip
+import sys
+
+def read_expression_file(file, skip_unknown=False):
+	d = {}
+	with gzip.open(file, 'rt') as fp:
+		for line in fp:
+			gene, val = line.split()
+			if gene.startswith('*'): continue
+			d[gene] = float(val)
+	return d
 
 class NameNormalizer:
 	"""Converts names to standard nomenclature."""
