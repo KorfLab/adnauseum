@@ -2,11 +2,13 @@ import argparse
 import gzip
 import os
 import sys
-
+import statistics
 
 parser = argparse.ArgumentParser()
 parser.add_argument('files', nargs='+')
 parser.add_argument('--normalize', '-n', action='store_true')
+parser.add_argument('--filter', '-f',  default=0, type=int)
+parser.add_argument('--ratio', action='store_true')
 arg = parser.parse_args()
 
 data = {}
@@ -28,8 +30,18 @@ if arg.normalize:
 		for i, val in enumerate(vals):
 			data[gene][i] /= scale[i]
 
+filtered = {}
 for gene, vals in data.items():
+	n = 0
+	for val in vals:
+		if val >= arg.filter: n += 1
+	if n >= 2:
+		filtered[gene] = vals
+
+for gene, vals in filtered.items():
 	print(f'{gene:15s}', end='')
 	for val in vals:
 		print('\t', int(val), sep='', end='')
+	if arg.ratio:
+		print('\t', round(statistics.stdev(vals)/statistics.mean(vals), ndigits=5), end='')
 	print()
