@@ -2,9 +2,11 @@ import argparse
 import os
 import sys
 import statistics
+import numpy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('files', nargs='+')
+parser.add_argument('--sum', '-s', action='store_true') 
 arg = parser.parse_args()
 
 data = {}
@@ -22,8 +24,23 @@ for path in arg.files:
 			data[gene].append(float(ratio))
 	n += 1
 
+rsum = {}
+drop = []
 for gene, ratios in data.items():
-	if len(ratios) < len(arg.files): continue
-	s = sum(ratios)
-	print(gene, ratios, s)
+	if len(ratios) < len(arg.files):
+		drop.append(gene)
+		continue
+	if arg.sum:
+		rsum[gene] = sum(ratios)	
+
+for gene in drop:
+	data.pop(gene)
+
+for gene, ratios in data.items():
+	print(gene, end='')
+	for ratio in ratios:
+		print('\t', ratio, sep='', end='')
+	if arg.sum:
+		print('\t', rsum[gene], sep='', end='')
+	print()
 
