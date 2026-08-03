@@ -8,13 +8,13 @@ import math
 parser = argparse.ArgumentParser()
 parser.add_argument('files', nargs='+')
 parser.add_argument('--normalize', '-n', action='store_true')
-parser.add_argument('--filter', '-f',  default=0, type=int)
+parser.add_argument('--filter', '-f',  nargs=2, default=(0,0), type=int)
 parser.add_argument('--ratio', action='store_true')
 parser.add_argument('--entropy', action='store_true')
 parser.add_argument('--pairwise', action='store_true')
 arg = parser.parse_args()
 
-if arg.ratio and arg.filter == 0: raise ZeroDivisionError("set filter to calculate variance ratio")
+if arg.ratio and arg.filter == (0,0): raise ZeroDivisionError("set filter to calculate variance ratio")
 
 def calculate_distribution(vals):
 	pseudocount = []
@@ -62,10 +62,12 @@ if arg.normalize:
 
 filtered = {}
 for gene, vals in data.items():
+	min_count = arg.filter[0]
+	min_n = arg.filter[1]
 	n = 0
 	for val in vals:
-		if val >= arg.filter: n += 1
-	if n >= 2:
+		if val >= min_count: n += 1
+	if n >= min_n:
 		filtered[gene] = vals
 
 for gene, vals in filtered.items():
